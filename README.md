@@ -37,13 +37,13 @@ NirvanaX leverages a hybrid backend utilizing robust FastAPI endpoints, determin
 graph TD
     User([User / Cosmic UI]) --> |REST API| API[FastAPI Gateway]
     
-    subgraph Security & Governance
+    subgraph SecurityGovernance [Security & Governance]
         API --> Firewall{Sentinel Layer Firewall}
         Firewall -- Blocked --> Reject[Audit Log / Reject]
         Firewall -- Verified --> Router[Task Router]
     end
     
-    subgraph Multi-Agent Council
+    subgraph Council [Multi-Agent Council]
         Router --> Core(Core Coordinator)
         Router --> Mkt(Market Intelligence)
         Router --> Strat(Strategy Architect)
@@ -51,20 +51,20 @@ graph TD
         Router --> Risk(Risk Governance)
     end
     
-    subgraph LLM Providers
+    subgraph LLMs [LLM Providers]
         Core & Exec <--> Gemini[Gemini 2.5 Flash]
         Mkt & Risk <--> Groq[Groq / Llama-3.1]
         Strat <--> Ollama[Ollama / Qwen]
     end
     
-    subgraph Deterministic Engines
+    subgraph EnginesLayer [Deterministic Engines]
         Router --> Engines[Analysis Engines]
         Engines -.-> IE(Income Engine)
         Engines -.-> SS(Stress Score)
         Engines -.-> ER(Emergency Radar)
     end
     
-    Multi-Agent Council --> Auditor{LLM Auditor Layer}
+    Core --> Auditor{LLM Auditor Layer}
     Auditor --> |Critic + Reviser| FinalResponse[Final Validated Response]
     FinalResponse --> User
 ```
