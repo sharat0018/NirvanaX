@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Zobot — Welcome</title>
+    <title>NirvanaX — Welcome</title>
+    <link rel="icon" type="image/png" href="NirvanaX.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap"
@@ -900,15 +901,11 @@
 
             <!-- Brand -->
             <div class="brand-header">
-                <div class="brand-logo">
-                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                        <path d="M16 2L4 8v8c0 7.73 5.12 14.96 12 16 6.88-1.04 12-8.27 12-16V8L16 2z"
-                            fill="rgba(255,255,255,0.2)" />
-                        <path d="M14 17l-3-3 1.4-1.4L14 14.2l5.6-5.6L21 10l-7 7z" fill="#fff" />
-                    </svg>
+                <div class="brand-logo" style="background:none;box-shadow:none;padding:0;">
+                    <img src="NirvanaX.png" alt="NirvanaX" width="64" height="64" style="border-radius:16px;display:block;" />
                 </div>
-                <div class="brand-name">Zobot</div>
-                <p class="brand-tagline">The future of your finances starts here</p>
+                <div class="brand-name">NirvanaX</div>
+                <p class="brand-tagline">Verified Financial Intelligence OS</p>
             </div>
 
             <!-- Progress -->
@@ -922,7 +919,7 @@
                 <div class="step-header">
                     <span class="step-number">Step 1 of 2</span>
                     <h2 class="step-title">Create your account</h2>
-                    <p class="step-subtitle">Enter your details to get started with Zobot</p>
+                    <p class="step-subtitle">Enter your details to get started with NirvanaX</p>
                 </div>
 
                 <div class="field">
@@ -983,7 +980,7 @@
                 <div class="card-preview">
                     <div class="preview-card">
                         <div class="pc-top">
-                            <span class="pc-bank">Zobot</span>
+                            <span class="pc-bank">NirvanaX</span>
                             <svg width="30" height="20" viewBox="0 0 30 20">
                                 <circle cx="10" cy="10" r="9" fill="#eb001b" opacity="0.85" />
                                 <circle cx="20" cy="10" r="9" fill="#f79e1b" opacity="0.85" />
@@ -1148,7 +1145,7 @@
 
         function showSuccess() {
             const userName = document.getElementById('fullName').value.trim() || 'User';
-            localStorage.setItem('zobot_user', userName);
+            localStorage.setItem('nirvanax_user', userName);
             successOverlay.classList.add('active');
             setTimeout(() => { window.location.href = 'index.html'; }, 2500);
         }

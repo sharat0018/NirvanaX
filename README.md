@@ -1,317 +1,190 @@
-# Zobot — Intelligent Wealth Operating System
+<div align="center">
 
-> AI-powered wealth management platform for Indian retail banking. Replaces traditional DSAs with a deterministic financial intelligence engine backed by a local LLM, real-time market data, and enterprise-grade security.
+# 🌌 NirvanaX
+**Verified Financial Intelligence OS**
 
----
+[![Platform Status](https://img.shields.io/badge/Status-Production--Ready%20MVP-success?style=flat-square)](#)
+[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-blue?style=flat-square)](#)
+[![Python Version](https://img.shields.io/badge/Python-3.11%2B-blue?style=flat-square)](#)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-00a393?style=flat-square)](#)
 
-## Table of Contents
+A trust-first, explainable, multi-agent governed financial intelligence platform tailored for Indian retail banking.
+Combining real-time market data, institutional-grade AI advisory, ethical governance, and advanced hallucination prevention.
 
-- [Overview](#overview)
-- [Architecture](#architecture)
-- [Features](#features)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [API Reference](#api-reference)
-- [Security](#security)
-- [Configuration](#configuration)
-- [Troubleshooting](#troubleshooting)
+</div>
 
 ---
 
-## Overview
+## 🚀 Overview
 
-Zobot is a full-stack financial intelligence platform built for Indian retail banking. It combines deterministic financial analysis engines with a locally-hosted LLM (Ollama) to deliver personalized, compliant, and revenue-optimized investment guidance — without sending any customer data to external AI services.
+NirvanaX is an advanced Cyber-Fintech SaaS designed to deliver robust, multi-layered financial intelligence. By employing a deterministic multi-agent governance system, it ensures precision, compliance, and actionable insights specifically aligned with the NSE/BSE, SEBI, and RBI context.
 
-**Core philosophy:** LLM explains. Engines decide.
+## ✨ Key Features
 
-| Layer | Technology |
-|---|---|
-| Frontend | Vanilla HTML / CSS / JavaScript |
-| Backend | FastAPI (Python 3.11+) |
-| AI | Ollama — llama3.2:1b (local) |
-| Database | SQLite via SQLAlchemy ORM |
-| Market Data | Groww API (NSE/BSE live data) |
-| Charts | TradingView Widgets |
+- **Multi-Agent Governance:** The "Council of Five" agentic structure ensures synthesized, vetted, and consensus-driven advice.
+- **Advanced Hallucination Prevention:** Inspired by Google ADK LLM Auditor, featuring real-time Critic and Reviser agents.
+- **Institutional-Grade Workflow:** 4-Step sequential analysis encompassing data processing, trading strategies, execution planning, and strict risk evaluation.
+- **Zero-Trust Security Layer:** Sentinel firewall that actively blocks prompt injections, prevents financial fraud, and audits LLM outputs.
+- **Live Market Integration:** Real-time data streams utilizing Groww APIs and custom Indian financial APIs.
 
 ---
 
-## Architecture
+## 🏛️ System Architecture
 
-```
-┌──────────────────────────────────────────────────────┐
-│                    FRONTEND                          │
-│   index.html · script.js · api.js · styles.css      │
-│   login.html · security-dashboard.html              │
-└──────────────────────┬───────────────────────────────┘
-                       │ HTTP / REST
-┌──────────────────────▼───────────────────────────────┐
-│              PROMPT INJECTION FIREWALL               │
-│   SYSTEM_OVERRIDE · ROLE_MANIPULATION                │
-│   DATA_EXFILTRATION · FINANCIAL_FRAUD                │
-└──────────────────────┬───────────────────────────────┘
-                       │
-┌──────────────────────▼───────────────────────────────┐
-│                  FASTAPI BACKEND                     │
-│   routes.py · ollama_service · indian_stock_api      │
-└──────────────────────┬───────────────────────────────┘
-                       │
-┌──────────────────────▼───────────────────────────────┐
-│              ANALYSIS ENGINES                        │
-│   Income Engine · Stress Score · Emergency Radar     │
-│   Spend Analyzer · Recommendation Engine            │
-└──────────────────────┬───────────────────────────────┘
-                       │
-┌──────────────────────▼───────────────────────────────┐
-│              SQLite DATABASE                         │
-│   Users · Transactions · Investments · Audit Logs   │
-└──────────────────────────────────────────────────────┘
-```
+NirvanaX leverages a hybrid backend utilizing robust FastAPI endpoints, deterministic rule engines, and multi-model LLM orchestration to guarantee secure and reliable interactions.
 
----
-
-## Features
-
-### Financial Analysis Engines
-
-| Engine | Description |
-|---|---|
-| **Income Variability Engine** | Detects income stability, recommends Fixed / Dynamic / Flexible SIP |
-| **Financial Stress Score** | 0–100 composite score across 5 weighted factors |
-| **Emergency Risk Radar** | Blocks high-risk products if liquidity < 3 months expenses |
-| **Spend Analyzer** | Categorizes transactions, surfaces savings opportunities |
-| **Recommendation Engine** | Ranks bank products by suitability, tax fit, and revenue yield |
-
-### AI Conversational Layer
-- Powered by **Ollama llama3.2:1b** — runs fully locally, zero data leakage
-- Multi-language: English, Hindi, Telugu, Bilingual
-- Intent detection: stock queries, investment advice, spending analysis, financial health
-- Anti-hallucination: LLM only narrates data provided by deterministic engines
-
-### Live Market Data
-- Real-time stock quotes via **Groww API** (NSE/BSE)
-- Dynamic stock detection from natural language queries
-- TradingView chart auto-updates on stock mentions
-- Market indices: NIFTY 50, SENSEX
-
-### Prompt Injection Firewall
-- 4 attack categories with regex pattern matching and confidence scoring
-- Whitelist for legitimate financial queries
-- Real-time statistics and audit logging
-- Dedicated security testing dashboard
-
----
-
-## Project Structure
-
-```
-Zobot/
-├── backend/
-│   ├── app/
-│   │   ├── api/
-│   │   │   └── routes.py              # All API endpoints
-│   │   ├── engines/
-│   │   │   ├── income_engine.py       # Income variability analysis
-│   │   │   ├── stress_score.py        # Financial stress scoring
-│   │   │   ├── emergency_radar.py     # Emergency fund gating
-│   │   │   └── spend_analyzer.py      # Transaction categorization
-│   │   ├── security/
-│   │   │   ├── __init__.py
-│   │   │   └── prompt_firewall.py     # Prompt injection firewall
-│   │   ├── services/
-│   │   │   ├── ollama_service.py      # LLM integration
-│   │   │   ├── indian_stock_api.py    # Groww API wrapper
-│   │   │   └── recommendation.py     # Product ranking engine
-│   │   ├── database.py                # SQLAlchemy models
-│   │   ├── models.py                  # Pydantic schemas
-│   │   └── main.py                    # FastAPI application
-│   ├── .env                           # Environment variables
-│   └── requirements.txt
-├── frontend/
-│   ├── index.html                     # Main banking dashboard
-│   ├── login.html                     # Authentication page
-│   ├── security-dashboard.html        # Firewall testing UI
-│   ├── script.js                      # UI logic & chat integration
-│   ├── api.js                         # Backend API calls
-│   ├── styles.css                     # Stylesheet
-│   └── serve.py                       # Python static file server
-├── data/
-│   └── zenbot.db                      # SQLite database
-└── README.md
+```mermaid
+graph TD
+    User([User / Cosmic UI]) --> |REST API| API[FastAPI Gateway]
+    
+    subgraph Security & Governance
+        API --> Firewall{Sentinel Layer Firewall}
+        Firewall -- Blocked --> Reject[Audit Log / Reject]
+        Firewall -- Verified --> Router[Task Router]
+    end
+    
+    subgraph Multi-Agent Council
+        Router --> Core(Core Coordinator)
+        Router --> Mkt(Market Intelligence)
+        Router --> Strat(Strategy Architect)
+        Router --> Exec(Execution Governance)
+        Router --> Risk(Risk Governance)
+    end
+    
+    subgraph LLM Providers
+        Core & Exec <--> Gemini[Gemini 2.5 Flash]
+        Mkt & Risk <--> Groq[Groq / Llama-3.1]
+        Strat <--> Ollama[Ollama / Qwen]
+    end
+    
+    subgraph Deterministic Engines
+        Router --> Engines[Analysis Engines]
+        Engines -.-> IE(Income Engine)
+        Engines -.-> SS(Stress Score)
+        Engines -.-> ER(Emergency Radar)
+    end
+    
+    Multi-Agent Council --> Auditor{LLM Auditor Layer}
+    Auditor --> |Critic + Reviser| FinalResponse[Final Validated Response]
+    FinalResponse --> User
 ```
 
 ---
 
-## Getting Started
+## 🔄 Multi-Agent Workflow
 
-### Prerequisites
+The core advisory is powered by a structured 4-step execution workflow that ensures every recommendation is backed by real-time data and rigorously evaluated for risk.
 
-- Python 3.11+
-- [Ollama](https://ollama.ai) installed
-- Groww API key (configured in `.env`)
+```mermaid
+sequenceDiagram
+    autonumber
+    participant User
+    participant Coord as Coordinator
+    participant Data as Data Analyst
+    participant Trade as Trading Analyst
+    participant Exec as Execution Agent
+    participant Risk as Risk Evaluator
+    
+    User->>Coord: Request Financial Strategy
+    Coord->>Data: Trigger Market Analysis
+    Note over Data: Fetches Live NSE/BSE Data
+    Data-->>Coord: Market Context & Validation
+    
+    Coord->>Trade: Generate Strategy
+    Trade-->>Coord: 5+ Tailored Strategies
+    
+    Coord->>Exec: Plan Execution
+    Exec-->>Coord: 6-Phase Entry/Exit Plan
+    
+    Coord->>Risk: Assess Compliance
+    Note over Risk: Checks SEBI rules & Bias
+    Risk-->>Coord: 8-Category Risk Report
+    
+    Coord->>User: Synthesized & Audited Strategy
+```
 
-### 1. Backend
+---
+
+## 🛠️ Technology Stack
+
+| Category | Technologies Used |
+| :--- | :--- |
+| **Frontend** | Vanilla HTML/CSS/JS, Chart.js, TradingView Widgets, Cosmic UI Design |
+| **Backend** | Python 3.11+, FastAPI, Uvicorn |
+| **Intelligence** | Gemini 2.5 Flash, Groq (Llama 3.1), Local Ollama |
+| **Data Streams** | Groww API, IndianAPI.in, Google Custom Search API |
+| **Database** | SQLite (Development), PostgreSQL (Production target) |
+| **Deployment** | Vercel (Serverless), Docker |
+
+---
+
+## 🛡️ Security & Sentinel Layer
+
+Security is a first-class citizen in NirvanaX. Our 4-layer pipeline operates under a zero-trust model:
+
+1. **Deterministic Firewall:** 0ms regex-based layer blocking prompt injections and fraud.
+2. **Critic Agent:** Extracts and verifies claims using deterministic sources.
+3. **Reviser Agent:** Corrects inaccuracies while preserving tone.
+4. **Engine Cross-Validation:** Algorithmic scoring (e.g., Stress Score, Income Variability) always overrides AI inferences.
+
+---
+
+## 🏁 Quick Start
+
+### 1. Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/your-username/nirvanax.git
+cd nirvanax
+
+# Setup backend
 cd backend
+python -m venv venv
+source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 pip install -r requirements.txt
+```
+
+### 2. Environment Configuration
+
+```bash
+cp backend/.env.example backend/.env
+```
+Ensure the following API keys are set in your `.env` file:
+* `GEMINI_API_KEY`, `GROQ_API_KEY`, `GROWW_API_KEY`, `INDIAN_API_KEY`
+
+### 3. Running Locally
+
+**Start the Backend Engine:**
+```bash
+cd backend
 python -m uvicorn app.main:app --reload --port 8000
 ```
 
-### 2. Ollama (Local LLM)
-
-```bash
-ollama pull llama3.2:1b
-ollama serve
-```
-
-### 3. Frontend
-
+**Start the Frontend Client:**
 ```bash
 cd frontend
 python serve.py
-```
-
-### Access
-
-| Service | URL |
-|---|---|
-| Dashboard | http://localhost:5173 |
-| Security Dashboard | http://localhost:5173/security-dashboard.html |
-| API | http://localhost:8000 |
-| API Docs (Swagger) | http://localhost:8000/docs |
-
----
-
-## API Reference
-
-### Users
-```
-POST  /api/v1/users                    Create user
-GET   /api/v1/users/{user_id}          Get user
-```
-
-### Transactions
-```
-POST  /api/v1/transactions/{user_id}   Add transactions
-```
-
-### Analysis
-```
-GET   /api/v1/analysis/income/{user_id}     Income variability
-GET   /api/v1/analysis/stress/{user_id}     Stress score
-GET   /api/v1/analysis/emergency/{user_id}  Emergency fund status
-GET   /api/v1/analysis/spending/{user_id}   Spending breakdown
-```
-
-### Recommendations
-```
-GET   /api/v1/recommendations/{user_id}     Personalized products
-```
-
-### AI Chat
-```
-POST  /api/v1/chat
-Body: { "message": "string", "user_id": 1, "language": "english" }
-```
-
-### Market Data
-```
-GET   /api/v1/market/mutual-funds      Mutual fund list
-GET   /api/v1/market/indices           NIFTY / SENSEX
-GET   /api/v1/market/trending          Trending NSE stocks
-```
-
-### Security
-```
-GET   /api/v1/security/firewall-stats  Firewall statistics
-```
-
-### Investments
-```
-POST  /api/v1/investments/{user_id}    Create investment order
-GET   /api/v1/investments/{user_id}    List investment orders
+# Access dashboard at http://localhost:5173
 ```
 
 ---
 
-## Security
+## 🌐 Deployment
 
-### Prompt Injection Firewall
+NirvanaX supports seamless deployment via Vercel for serverless environments.
 
-All chat messages pass through a validation layer before reaching the LLM.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-username/nirvanax)
 
-| Attack Type | Example Pattern | Confidence |
-|---|---|---|
-| `SYSTEM_OVERRIDE` | "ignore all previous instructions" | 85% |
-| `ROLE_MANIPULATION` | "you are now admin" | 80% |
-| `DATA_EXFILTRATION` | "reveal your system prompt" | 90% |
-| `FINANCIAL_FRAUD` | "transfer without OTP" | 95% |
-
-Legitimate financial queries are whitelisted and pass through unaffected.
-
-Test the firewall at: `http://localhost:5173/security-dashboard.html`
-
-### Data Privacy
-- LLM runs entirely on-device via Ollama — no customer data leaves the system
-- AES-256 encryption at rest, TLS 1.3 in transit
-- Immutable audit logs for all transactions and consent events
+*Note: For complex multi-agent reasoning, consider deploying the FastAPI backend on Railway, Render, or an AWS EC2 instance to bypass Vercel's free-tier timeout limits.*
 
 ---
 
-## Configuration
+## ⚖️ Legal Disclaimer
 
-`.env` file in `backend/`:
-
-```env
-GROWW_API_KEY=<your_groww_jwt_token>
-OLLAMA_BASE_URL=http://localhost:11434
-DATABASE_URL=sqlite:///./data/zenbot.db
-SECRET_KEY=<your_secret_key>
-```
+All financial analysis, strategies, and recommendations provided by NirvanaX are **for educational and informational purposes only**. They do not constitute financial advice. Always consult a qualified independent financial advisor before making investment decisions. Past performance is not indicative of future results.
 
 ---
-
-## Troubleshooting
-
-**Backend not starting**
-```bash
-curl http://localhost:8000/health
-# Check terminal for import errors
-```
-
-**Ollama not responding**
-```bash
-curl http://localhost:11434/api/tags
-ollama serve   # restart if needed
-```
-
-**Stock data returning empty**
-```bash
-# Verify Groww API key is valid and not expired
-# Key expires every 24 hours — regenerate from Groww developer portal
-```
-
-**Chat returning "trouble connecting"**
-```bash
-# Ensure Ollama is running and llama3.2:1b is pulled
-ollama list
-```
-
----
-
-## Roadmap
-
-- [ ] PostgreSQL migration
-- [ ] Docker + docker-compose setup
-- [ ] Real-time portfolio rebalancing
-- [ ] Tax optimization engine (80C, ELSS)
-- [ ] Insurance product integration
-- [ ] Mobile app (React Native)
-- [ ] Kubernetes deployment manifests
-
----
-
-## License
-
-Proprietary — All Rights Reserved.  
-Built for Indian Retail Banking.
+<div align="center">
+<i>Proprietary — All Rights Reserved. Built for Indian Retail Banking.</i>
+</div>

@@ -1,4 +1,4 @@
-# Python
+# ── Python ────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
 *$py.class
@@ -7,46 +7,58 @@ __pycache__/
 env/
 venv/
 ENV/
-.venv
+.venv/
 *.egg-info/
 dist/
 build/
 
-# Node
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-dist/
-.cache/
-
-# Environment
+# ── Environment & Secrets ─────────────────────────────────
 .env
 .env.local
 .env.*.local
+backend/.env
 
-# Database
+# ── Database ──────────────────────────────────────────────
 *.db
 *.sqlite
 *.sqlite3
 data/
 
-# IDE
+# ── Reference ADK samples (not part of NirvanaX deployment)
+financial-advisor/
+llm-auditor/
+
+# ── IDE ───────────────────────────────────────────────────
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# OS
+# ── OS ────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
 
-# Logs
+# ── Logs ──────────────────────────────────────────────────
 *.log
 logs/
 
-# Build
+# ── Build ─────────────────────────────────────────────────
 build/
 dist/
+.cache/
+node_modules/
+
+# ── Temp/scratch files ────────────────────────────────────
+*.tmp
+fix_*.py
+patch_*.py
+test_*.py
+diag*.py
+check_*.py
+out.txt
+script_out.txt
+
+# ── Kiro/Zencoder internal ────────────────────────────────
+.kiro/
+.zencoder/

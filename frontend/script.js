@@ -1,5 +1,6 @@
 /* ═══════════════════════════════════════════════
-   Zobot Bank — Interactive Dashboard Script v3.0
+   NirvanaX — Verified Financial Intelligence OS
+   Interactive Dashboard Script v2.0
    ═══════════════════════════════════════════════ */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -412,6 +413,8 @@ document.addEventListener('DOMContentLoaded', () => {
   async function sendChat() {
     const msg = chatInput?.value.trim();
     if (!msg) return;
+
+    // Append user message
     const userDiv = document.createElement('div');
     userDiv.className = 'chat-msg user';
     userDiv.innerHTML = `<p>${msg}</p><span class="chat-time">Just now</span>`;
@@ -419,12 +422,28 @@ document.addEventListener('DOMContentLoaded', () => {
     chatInput.value = '';
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
+    // Show deliberation pulse
+    const pulse = showDeliberationPulse(chatMessages);
+
     const langMap = {'en': 'english', 'hi': 'hindi', 'te': 'telugu', 'bi': 'english'};
-    const data = await sendChatMessage(msg, langMap[chatLang] || 'english');
-    
+    let data;
+    try {
+      data = await sendGovernanceChat(msg, 1, langMap[chatLang] || 'english');
+    } catch (e) {
+      // Fallback to legacy sendChatMessage if governance API unavailable
+      try { data = await sendChatMessage(msg, langMap[chatLang] || 'english'); } catch (e2) { data = { response: 'NirvanaX is connecting... Please ensure the backend is running.' }; }
+    }
+
+    hideDeliberationPulse();
+
+    // ── Render Verification Panel ──
+    if (data.governance) {
+      renderVerificationPanel(data.governance, data.council_deliberation);
+    }
+
     const stockMatch = msg.toLowerCase().match(/\b(stock|stocks|share|shares)\b/);
     const investMatch = msg.toLowerCase().match(/\b(invest|investment|portfolio|recommend|suggest|where to invest)\b/);
-    
+
     if (stockMatch && data.response) {
       const words = msg.split(' ');
       let stock = '';
@@ -435,69 +454,57 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
       if (!stock) stock = words[0].toUpperCase();
-      
       const text = data.response;
       const priceMatch = text.match(/₹([\d,]+\.?\d*)/g);
       const changeMatch = text.match(/([+-]?\d+\.\d+)%/);
       const volumeMatch = text.match(/([\d,]+)\s+shares/);
-      const capMatch = text.match(/market cap[^₹]*₹([\d,]+)/i);
-      
       if (summaryBody) {
         summaryBody.innerHTML = `
           <div class="summary-table-title">📈 ${stock} Live Data</div>
-          <table class="summary-table">
-            <thead><tr><th>Metric</th><th>Value</th></tr></thead>
-            <tbody>
-              <tr><td>Current Price</td><td>${priceMatch ? priceMatch[0] : 'N/A'}</td></tr>
-              <tr><td>Change</td><td style="color:${changeMatch && parseFloat(changeMatch[1]) >= 0 ? 'var(--success)' : 'var(--danger)'}">${changeMatch ? changeMatch[1] + '%' : 'N/A'}</td></tr>
-              <tr><td>Volume</td><td>${volumeMatch ? volumeMatch[1] + ' shares' : 'N/A'}</td></tr>
-              <tr><td>Status</td><td>${changeMatch && parseFloat(changeMatch[1]) >= 0 ? '📈 Up' : '📉 Down'}</td></tr>
-            </tbody>
-          </table>
-          <div style="margin-top:16px;padding:12px;background:rgba(59,130,246,0.1);border-radius:8px;font-size:13px;color:var(--text-muted)">
-            📊 View live chart in floating trading widget (bottom-right)
-          </div>`;
+          <table class="summary-table"><thead><tr><th>Metric</th><th>Value</th></tr></thead>
+          <tbody>
+            <tr><td>Current Price</td><td>${priceMatch ? priceMatch[0] : 'N/A'}</td></tr>
+            <tr><td>Change</td><td style="color:${changeMatch && parseFloat(changeMatch[1]) >= 0 ? 'var(--success)' : 'var(--danger)'}">${changeMatch ? changeMatch[1] + '%' : 'N/A'}</td></tr>
+            <tr><td>Volume</td><td>${volumeMatch ? volumeMatch[1] + ' shares' : 'N/A'}</td></tr>
+            <tr><td>Status</td><td>${changeMatch && parseFloat(changeMatch[1]) >= 0 ? '📈 Up' : '📉 Down'}</td></tr>
+          </tbody></table>
+          <div style="margin-top:16px;padding:12px;background:rgba(59,130,246,0.1);border-radius:8px;font-size:13px;color:var(--text-muted)">📊 View live chart in floating trading widget</div>`;
       }
-      
       const symbolMap = {'TCS': 'BSE:TCS', 'RELIANCE': 'BSE:RELIANCE', 'HDFC': 'BSE:HDFCBANK', 'AXIS': 'BSE:AXISBANK', 'INFOSYS': 'BSE:INFY', 'INFY': 'BSE:INFY', 'WIPRO': 'BSE:WIPRO', 'SBIN': 'BSE:SBIN', 'ICICI': 'BSE:ICICIBANK', 'BHARTI': 'BSE:BHARTIARTL', 'ITC': 'BSE:ITC', 'LT': 'BSE:LT', 'IRCTC': 'BSE:IRCTC', 'TATAMOTORS': 'BSE:TATAMOTORS', 'TATA': 'BSE:TATAMOTORS', 'ADANI': 'BSE:ADANIENT', 'ONGC': 'BSE:ONGC', 'COALINDIA': 'BSE:COALINDIA', 'POWERGRID': 'BSE:POWERGRID', 'NTPC': 'BSE:NTPC'};
       const tfChart = document.querySelector('#tradingFloatingWidget .tradingview-widget-container');
       if (tfChart) {
         const symbol = symbolMap[stock] || `BSE:${stock}`;
         tfChart.innerHTML = `<div class="tradingview-widget-container__widget"></div><script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>{"symbol": "${symbol}","width": "100%","height": "100%","locale": "in","dateRange": "1M","colorTheme": "dark","isTransparent": true,"autosize": true}</script>`;
-        const tfWidget = document.getElementById('tradingFloatingWidget');
-        if (tfWidget && tfWidget.classList.contains('collapsed')) tfWidget.classList.remove('collapsed');
+        const tfWidgetEl = document.getElementById('tradingFloatingWidget');
+        if (tfWidgetEl && tfWidgetEl.classList.contains('collapsed')) tfWidgetEl.classList.remove('collapsed');
       }
     } else if (investMatch && data.recommendations) {
       if (summaryBody) {
         let recoRows = '';
         data.recommendations.slice(0, 5).forEach(r => {
           const riskColor = r.risk_level === 'LOW' ? 'var(--success)' : r.risk_level === 'MEDIUM' ? 'var(--warning)' : 'var(--danger)';
-          recoRows += `<tr>
-            <td>${r.product_name}</td>
-            <td>${r.product_type}</td>
-            <td style="color:${riskColor}">${r.risk_level}</td>
-            <td>${r.suitability_score}/100</td>
-            <td>₹${r.min_investment.toLocaleString('en-IN')}</td>
-          </tr>`;
+          recoRows += `<tr><td>${r.product_name}</td><td>${r.product_type}</td><td style="color:${riskColor}">${r.risk_level}</td><td>${r.suitability_score}/100</td><td>₹${r.min_investment.toLocaleString('en-IN')}</td></tr>`;
         });
         summaryBody.innerHTML = `
-          <div class="summary-table-title">📊 Investment Recommendations</div>
-          <table class="summary-table">
-            <thead><tr><th>Product</th><th>Type</th><th>Risk</th><th>Score</th><th>Min Invest</th></tr></thead>
-            <tbody>${recoRows}</tbody>
-          </table>
-          <div style="margin-top:16px;padding:12px;background:rgba(16,185,129,0.1);border-radius:8px;font-size:13px;color:var(--text-muted)">
-            ✅ Recommendations based on your financial stress score and income stability
-          </div>`;
+          <div class="summary-table-title">📊 Verified Investment Recommendations</div>
+          <table class="summary-table"><thead><tr><th>Product</th><th>Type</th><th>Risk</th><th>Score</th><th>Min Invest</th></tr></thead>
+          <tbody>${recoRows}</tbody></table>
+          <div style="margin-top:16px;padding:12px;background:rgba(16,185,129,0.1);border-radius:8px;font-size:13px;color:var(--text-muted)">✅ Governance-verified · Trust-scored · Bias-audited</div>`;
       }
     } else {
       const intent = detectIntent(msg);
-      if (intent && tables[intent]) summaryBody.innerHTML = tables[intent];
+      if (intent && tables[intent] && summaryBody) summaryBody.innerHTML = tables[intent];
     }
-    
+
+    // Append bot response with governance badge
     const botDiv = document.createElement('div');
     botDiv.className = 'chat-msg bot';
-    botDiv.innerHTML = `<p>${data.response || data.message}</p><span class="chat-time">Just now</span>`;
+    const trustScore = data.governance?.trust_score;
+    const riskLevel = data.governance?.risk_level;
+    const govBadge = trustScore != null
+      ? `<span class="gov-badge">🛡️ Trust: ${trustScore}/100 · ${riskLevel || ''}</span>`
+      : '';
+    botDiv.innerHTML = `<p>${data.response || data.message}</p>${govBadge}<span class="chat-time">Just now</span>`;
     chatMessages.appendChild(botDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
@@ -537,3 +544,362 @@ document.addEventListener('DOMContentLoaded', () => {
   calcEMI();
 });
 
+
+
+// ══════════════════════════════════════════════════════════
+// NIRVANAX — Advisory Console Interaction Logic
+// ══════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', () => {
+  // ── Advisory Console page nav ──
+  const advisoryNavLink = document.querySelector('[data-nav="advisory"]');
+  if (advisoryNavLink) {
+    advisoryNavLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      // Use existing switchPage if available
+      if (typeof switchPage === 'function') {
+        switchPage('advisory');
+      } else {
+        document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+        const target = document.querySelector('[data-page="advisory"]');
+        if (target) target.classList.add('active');
+        document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
+        advisoryNavLink.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      loadAuditTrail();
+    });
+  }
+
+  // ── Advisory Mode Chips ──
+  let currentAdvisoryMode = 'full';
+  document.querySelectorAll('.mode-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.mode-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      currentAdvisoryMode = chip.dataset.mode || 'full';
+    });
+  });
+
+  // ── Advisory Send ──
+  const advisoryInput = document.getElementById('advisoryInput');
+  const advisorySend = document.getElementById('advisorySend');
+  const advisoryMessages = document.getElementById('advisoryMessages');
+
+  async function sendAdvisoryMessage() {
+    const query = advisoryInput?.value.trim();
+    if (!query || !advisoryMessages) return;
+
+    // Append user message
+    const userDiv = document.createElement('div');
+    userDiv.className = 'chat-msg user';
+    userDiv.innerHTML = `<p>${query}</p><span class="chat-time">Just now</span>`;
+    advisoryMessages.appendChild(userDiv);
+    advisoryInput.value = '';
+    advisoryMessages.scrollTop = advisoryMessages.scrollHeight;
+
+    // Set council to deliberating
+    const councilStatus = document.getElementById('councilStatus');
+    if (councilStatus) {
+      councilStatus.textContent = 'Deliberating...';
+      councilStatus.className = 'agent-council-status deliberating';
+    }
+
+    // Set all agent cards to active/loading
+    ['coordinator', 'market', 'strategy', 'execution', 'risk'].forEach(key => {
+      const card = document.getElementById(`agentCard_${key}`);
+      const verdict = document.getElementById(`verdict_${key}`);
+      const response = document.getElementById(`response_${key}`);
+      if (card) card.className = 'agent-card active';
+      if (verdict) { verdict.textContent = 'Analyzing...'; verdict.className = 'agent-verdict-badge neutral'; }
+      if (response) response.textContent = 'Processing...';
+    });
+
+    // Show deliberation pulse in chat
+    const pulse = typeof showDeliberationPulse === 'function'
+      ? showDeliberationPulse(advisoryMessages)
+      : null;
+
+    let result;
+    try {
+      result = await sendAdvisoryQuery(query, 1, 'english', currentAdvisoryMode);
+    } catch (e) {
+      // Fallback to legacy chat
+      try {
+        result = await sendGovernanceChat(query, 1, 'english');
+        result.agent_deliberation = result.council_deliberation || {};
+      } catch (e2) {
+        result = {
+          primary_response: 'NirvanaX Advisory Console is connecting. Please ensure the backend is running on port 8000.',
+          governance: null, agent_deliberation: {}
+        };
+      }
+    }
+
+    if (pulse) pulse.remove();
+
+    // Render agent council panel
+    if (result.governance) {
+      renderAdvisoryConsole(result);
+    }
+
+    // Append bot response with trust badge
+    const botDiv = document.createElement('div');
+    botDiv.className = 'chat-msg bot';
+    const trustScore = result.governance?.trust_score;
+    const riskLevel = result.governance?.risk_level;
+    const consensusAction = result.governance?.consensus?.action;
+    const govBadge = trustScore != null
+      ? `<span class="gov-badge">🛡️ Trust: ${trustScore}/100 · ${riskLevel || ''} · ${consensusAction || ''}</span>`
+      : '';
+    botDiv.innerHTML = `<p>${result.primary_response || result.response || ''}</p>${govBadge}<span class="chat-time">Just now</span>`;
+    advisoryMessages.appendChild(botDiv);
+    advisoryMessages.scrollTop = advisoryMessages.scrollHeight;
+
+    // Refresh audit trail
+    setTimeout(loadAuditTrail, 500);
+  }
+
+  advisorySend?.addEventListener('click', sendAdvisoryMessage);
+  advisoryInput?.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAdvisoryMessage(); }
+  });
+  advisoryInput?.addEventListener('input', () => {
+    if (advisoryInput) {
+      advisoryInput.style.height = 'auto';
+      advisoryInput.style.height = Math.min(advisoryInput.scrollHeight, 120) + 'px';
+    }
+  });
+
+  // ── Nav advisory link style ──
+  const navAdvisoryLink = document.querySelector('.nav-advisory-link');
+  if (navAdvisoryLink) {
+    navAdvisoryLink.style.cssText = 'background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(79,70,229,0.1));border:1px solid rgba(99,102,241,0.3);border-radius:8px;padding:4px 10px;color:#6366f1;font-weight:700;';
+  }
+});
+
+
+// ══════════════════════════════════════════════════════════
+// NIRVANAX — Financial Advisor (Google ADK) UI Logic
+// ══════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  // ── State ──
+  const advisorState = {
+    reports: { analysis: '', strategies: '', execution: '', risk: '' },
+    currentReport: 'analysis',
+    step: 'INIT',
+  };
+
+  // ── Nav link ──
+  const advisorNavLink = document.querySelector('[data-nav="advisor"]');
+  if (advisorNavLink) {
+    advisorNavLink.style.cssText = 'background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(5,150,105,0.08));border:1px solid rgba(16,185,129,0.25);border-radius:8px;padding:4px 10px;color:#10b981;font-weight:700;';
+    advisorNavLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+      const target = document.querySelector('[data-page="advisor"]');
+      if (target) target.classList.add('active');
+      document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
+      advisorNavLink.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  // ── Workflow step updater ──
+  function updateWorkflowStep(step) {
+    const stepMap = {
+      'INIT': 0,
+      'DATA_ANALYSIS': 1, 'AWAITING_RISK_PROFILE': 1,
+      'TRADING_ANALYSIS': 2, 'AWAITING_EXECUTION_PREFS': 2,
+      'EXECUTION_PLANNING': 3, 'RISK_EVALUATION': 4,
+      'COMPLETE': 4,
+    };
+    const currentIdx = stepMap[step] || 0;
+    const badge = document.getElementById('advisorStepBadge');
+    const stepLabels = ['Ready', 'Data Analysis', 'Strategies', 'Execution', 'Risk Eval'];
+    if (badge) badge.textContent = `Step: ${stepLabels[currentIdx] || step}`;
+
+    for (let i = 1; i <= 4; i++) {
+      const el = document.getElementById(`wfStep${i}`);
+      const status = document.getElementById(`wfStatus${i}`);
+      if (!el || !status) continue;
+      if (i < currentIdx) {
+        el.className = 'advisor-workflow-step complete';
+        status.textContent = '✓ Done';
+        status.className = 'wf-step-status complete';
+      } else if (i === currentIdx) {
+        el.className = 'advisor-workflow-step active';
+        status.textContent = 'Active';
+        status.className = 'wf-step-status active';
+      } else {
+        el.className = 'advisor-workflow-step';
+        status.textContent = 'Pending';
+        status.className = 'wf-step-status';
+      }
+    }
+  }
+
+  // ── Agent status updater ──
+  function setAgentStatus(agent, status) {
+    const el = document.getElementById(`agentStatus_${agent}`);
+    if (!el) return;
+    const map = { idle: 'Idle', running: 'Running...', complete: '✓ Done', error: 'Error' };
+    el.textContent = map[status] || status;
+    el.className = `advisor-agent-status ${status}`;
+  }
+
+  // ── Report viewer ──
+  window.showAdvisorReport = function(type) {
+    document.querySelectorAll('[id^="reportTab_"]').forEach(t => t.classList.remove('active'));
+    const tab = document.getElementById(`reportTab_${type}`);
+    if (tab) tab.classList.add('active');
+    advisorState.currentReport = type;
+    const content = document.getElementById('advisorReportContent');
+    if (!content) return;
+    const report = advisorState.reports[type];
+    if (report) {
+      content.innerHTML = renderMarkdown(report);
+    } else {
+      content.innerHTML = `<div style="color:rgba(148,163,184,0.4);font-size:12px;padding:20px 0;">
+        ${type.charAt(0).toUpperCase() + type.slice(1)} report not yet generated. Complete the advisory workflow to view.
+      </div>`;
+    }
+  };
+
+  // ── Reset session ──
+  window.resetAdvisorSession = async function() {
+    try { await resetAdvisorSessionAPI(1); } catch (e) {}
+    advisorState.reports = { analysis: '', strategies: '', execution: '', risk: '' };
+    advisorState.step = 'INIT';
+    updateWorkflowStep('INIT');
+    ['data', 'trading', 'execution', 'risk'].forEach(a => setAgentStatus(a, 'idle'));
+    const msgs = document.getElementById('advisorChatMessages');
+    if (msgs) {
+      msgs.innerHTML = `<div class="chat-msg bot">
+        <p>🏛️ Session reset. Welcome back to <strong>NirvanaX Financial Advisor</strong>. Provide a stock ticker to begin a new analysis.</p>
+        <span class="chat-time">Just now</span>
+      </div>`;
+    }
+    showAdvisorReport('analysis');
+  };
+
+  // ── Send message ──
+  const advisorInput = document.getElementById('advisorInput');
+  const advisorSendBtn = document.getElementById('advisorSendBtn');
+  const advisorMessages = document.getElementById('advisorChatMessages');
+
+  async function sendAdvisorMsg() {
+    const msg = advisorInput?.value.trim();
+    if (!msg || !advisorMessages) return;
+
+    // Append user message
+    const userDiv = document.createElement('div');
+    userDiv.className = 'chat-msg user';
+    userDiv.innerHTML = `<p>${msg}</p><span class="chat-time">Just now</span>`;
+    advisorMessages.appendChild(userDiv);
+    advisorInput.value = '';
+    advisorMessages.scrollTop = advisorMessages.scrollHeight;
+
+    // Show typing indicator
+    const pulse = typeof showDeliberationPulse === 'function'
+      ? showDeliberationPulse(advisorMessages)
+      : null;
+
+    // Update agent statuses based on current step
+    const step = advisorState.step;
+    if (step === 'INIT') setAgentStatus('data', 'running');
+    else if (step === 'AWAITING_RISK_PROFILE') setAgentStatus('trading', 'running');
+    else if (step === 'AWAITING_EXECUTION_PREFS') {
+      setAgentStatus('execution', 'running');
+      setAgentStatus('risk', 'running');
+    }
+
+    let result;
+    try {
+      result = await sendAdvisorMessage(msg, 1);
+    } catch (e) {
+      if (pulse) pulse.remove();
+      const errDiv = document.createElement('div');
+      errDiv.className = 'chat-msg bot';
+      errDiv.innerHTML = `<p>⚠️ Unable to connect to NirvanaX backend. Please ensure the server is running on port 8000.</p><span class="chat-time">Just now</span>`;
+      advisorMessages.appendChild(errDiv);
+      advisorMessages.scrollTop = advisorMessages.scrollHeight;
+      return;
+    }
+
+    if (pulse) pulse.remove();
+
+    // Update workflow state
+    advisorState.step = result.step || 'INIT';
+    updateWorkflowStep(result.step);
+
+    // Update agent statuses and store reports
+    if (result.show_analysis && result.agent_output?.report) {
+      advisorState.reports.analysis = result.agent_output.report;
+      setAgentStatus('data', 'complete');
+      showAdvisorReport('analysis');
+    }
+    if (result.show_strategies && result.agent_output?.strategies_report) {
+      advisorState.reports.strategies = result.agent_output.strategies_report;
+      setAgentStatus('trading', 'complete');
+    }
+    if (result.show_execution) {
+      const execOut = result.agent_output?.execution;
+      if (execOut?.execution_plan) {
+        advisorState.reports.execution = execOut.execution_plan;
+        setAgentStatus('execution', 'complete');
+      }
+      const riskOut = result.agent_output?.risk;
+      if (riskOut?.risk_evaluation) {
+        advisorState.reports.risk = riskOut.risk_evaluation;
+        setAgentStatus('risk', 'complete');
+        showAdvisorReport('risk');
+      }
+    }
+
+    // Build bot message
+    const botDiv = document.createElement('div');
+    botDiv.className = 'chat-msg bot';
+    let responseHtml = `<p>${(result.response || '').replace(/\n/g, '<br>')}</p>`;
+
+    // Add final recommendation badge
+    if (result.final_recommendation) {
+      const recMap = {
+        'PROCEED': { cls: 'proceed', icon: '✅' },
+        'PROCEED WITH CAUTION': { cls: 'caution', icon: '⚠️' },
+        'DO NOT PROCEED': { cls: 'reject', icon: '🚫' },
+      };
+      const rec = recMap[result.final_recommendation] || { cls: 'caution', icon: '⚠️' };
+      responseHtml += `<div class="final-rec-badge ${rec.cls}">${rec.icon} ${result.final_recommendation}</div>`;
+    }
+
+    responseHtml += `<span class="chat-time">Just now</span>`;
+    botDiv.innerHTML = responseHtml;
+    advisorMessages.appendChild(botDiv);
+    advisorMessages.scrollTop = advisorMessages.scrollHeight;
+  }
+
+  advisorSendBtn?.addEventListener('click', sendAdvisorMsg);
+  advisorInput?.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAdvisorMsg(); }
+  });
+  advisorInput?.addEventListener('input', () => {
+    if (advisorInput) {
+      advisorInput.style.height = 'auto';
+      advisorInput.style.height = Math.min(advisorInput.scrollHeight, 100) + 'px';
+    }
+  });
+
+  // ── Quick action buttons ──
+  document.querySelectorAll('.advisor-quick-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (advisorInput) advisorInput.value = btn.dataset.msg || btn.textContent;
+      sendAdvisorMsg();
+    });
+  });
+
+  // ── Init report viewer ──
+  showAdvisorReport('analysis');
+});

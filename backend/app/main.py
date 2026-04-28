@@ -6,9 +6,9 @@ from app.database import init_db
 import os
 
 app = FastAPI(
-    title="Zobot API",
-    description="AI-Powered Wealth Operating System for Indian Retail Banking",
-    version="1.0.0"
+    title="NirvanaX API",
+    description="Verified Financial Intelligence OS — Multi-Agent AI Financial Governance Platform",
+    version="2.0.0"
 )
 
 # CORS configuration
@@ -30,19 +30,21 @@ def startup_event():
     init_db()
 
 # Include routes
-app.include_router(router, prefix="/api/v1", tags=["Zobot"])
+app.include_router(router, prefix="/api/v1", tags=["NirvanaX"])
 
 @app.get("/")
 def root():
     return {
-        "message": "Zobot API - AI Wealth Operating System",
-        "version": "1.0.0",
-        "status": "active"
+        "message": "NirvanaX API — Verified Financial Intelligence OS",
+        "tagline": "Trust-first, explainable, multi-agent governed financial intelligence",
+        "version": "2.0.0",
+        "status": "active",
+        "architecture": "Council of Three Multi-Agent Governance"
     }
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy"}
+    return {"status": "healthy", "platform": "NirvanaX"}
 
 if __name__ == "__main__":
     import uvicorn
