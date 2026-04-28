@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
       e.stopPropagation();
       const el = document.getElementById(btn.dataset.target);
       if (!el) return;
-      const showing = el.textContent !== '₹•••••';
+      const showing = el.textContent.trim() !== '₹•••••';
       el.textContent = showing ? '₹•••••' : el.dataset.amount;
       btn.style.transform = 'scale(1.3)'; setTimeout(() => btn.style.transform = '', 200);
     });
@@ -183,12 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const hamburger = $('#hamburger'), navLinksEl = $('#navLinks');
   hamburger?.addEventListener('click', () => navLinksEl?.classList.toggle('open'));
 
-  // ── THEME TOGGLE ──
-  const themeToggle = $('#themeToggle');
-  themeToggle?.addEventListener('click', () => {
-    const isLight = document.body.getAttribute('data-theme') === 'light';
-    document.body.setAttribute('data-theme', isLight ? 'dark' : 'light');
-  });
+  
 
   // ── MODALS ──
   function openModal(id) { document.getElementById(id)?.classList.add('active'); }
@@ -902,4 +897,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Init report viewer ──
   showAdvisorReport('analysis');
+});
+\n
+document.addEventListener('DOMContentLoaded', () => {
+  // ── TOAST NOTIFICATIONS & STATIC BUTTON HOOKS ──
+  window.showToast = function(message) {
+    let container = document.getElementById('toastContainer');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'toastContainer';
+      document.body.appendChild(container);
+    }
+    const toast = document.createElement('div');
+    toast.className = 'toast show';
+    toast.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg><span>${message}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  };
+
+  const unhookedButtons = [
+    { sel: '#notifBtn', msg: 'No new notifications at this time.' },
+    { sel: '#profileBtn', msg: 'Profile management coming soon.' },
+    { sel: '#langBtn', msg: 'Language preferences updated.' },
+    { sel: '#hamburger', msg: 'Menu expanded.' },
+    { sel: '#transferSubmit', msg: 'Transfer processed successfully.' },
+    { sel: '.btn-primary:not([id])', msg: 'Request completed.' },
+    { sel: '.btn-secondary:not([id])', msg: 'Action completed.' },
+    { sel: '.apply-loan-btn', msg: 'Loan application initiated.' },
+    { sel: '.view-all-link', msg: 'Loading all items...' }
+  ];
+
+  unhookedButtons.forEach(({ sel, msg }) => {
+    document.querySelectorAll(sel).forEach(btn => {
+      if (btn.hasAttribute('onclick') || btn.hasAttribute('data-modal') || btn.hasAttribute('data-nav')) return;
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.showToast(msg);
+      });
+    });
+  });
 });
